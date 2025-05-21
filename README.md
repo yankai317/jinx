@@ -1,3 +1,39 @@
+# Jinx Project Overview
+
+Jinx appears to be a comprehensive enterprise application, likely a learning management system (LMS) or a corporate training platform. It features distinct modules for API definition, backend services, client-facing interactions, UI, and application startup. The project is built using Java with Spring Boot for the backend and Vue.js for the frontend.
+
+## Architecture and Modules
+
+The Jinx project follows a modular, multi-layered architecture:
+
+*   **`jinx-api`**: This module defines the core data structures (Data Transfer Objects - DTOs) and API contracts (Java interfaces) used for communication between different backend modules. It ensures data consistency and provides a clear definition of the available operations.
+*   **`jinx-service`**: This is the heart of the backend, containing the business logic, data access operations (using MyBatis-Plus with MySQL), and integrations with external services. These integrations include Alibaba Cloud services (OSS for storage, SchedulerX for tasks, MOS for messaging/caching/config), DingTalk (for communication/collaboration), and potentially OpenAI.
+*   **`jinx-client`**: This module exposes the backend functionalities as RESTful APIs. It acts as the presentation layer for the backend, handling incoming HTTP requests from clients (primarily the `jinx-ui` module) and delegating business operations to `jinx-service`.
+*   **`jinx-ui`**: This is the frontend module, built as a Vue.js single-page application (SPA). It provides the user interface for interacting with the Jinx platform, making calls to the APIs exposed by `jinx-client`. It uses Ant Design as its component library and includes features like charting and DingTalk JS integration.
+*   **`jinx-starter`**: This module is the main entry point for the application. It packages all the other modules (`jinx-api`, `jinx-service`, `jinx-client`, and the compiled `jinx-ui` assets) into a runnable Spring Boot application.
+
+## Module Interactions
+
+1.  The **`jinx-ui`** (Vue.js frontend) makes HTTP requests to the API endpoints defined in **`jinx-client`**.
+2.  **`jinx-client`** (Spring Boot controllers) receives these requests, validates them (using DTOs from **`jinx-api`**), and then calls appropriate methods in **`jinx-service`**.
+3.  **`jinx-service`** executes the core business logic, interacts with the MySQL database (via MyBatis mappers), and communicates with any necessary external services. It uses DTOs from **`jinx-api`** for data exchange with `jinx-client`.
+4.  The **`jinx-starter`** module bundles all these backend modules and the compiled static assets from `jinx-ui` into a single executable Spring Boot application.
+
+## Key Technologies
+
+*   **Backend:** Java 21, Spring Boot 3.1.5, Spring MVC, Spring Data (indirectly via MyBatis-Plus)
+*   **Frontend:** Vue.js 3, Vue Router, Ant Design Vue
+*   **Database:** MySQL (with MyBatis-Plus for ORM-like functionality)
+*   **Build & Dependency Management:** Maven (for Java modules), npm (for the UI module)
+*   **API Style:** RESTful APIs
+*   **External Services/Integrations (as per dependencies):**
+    *   Alibaba Cloud: OSS, SchedulerX, MOS (Messaging, KV Store, Config)
+    *   DingTalk SDK
+    *   OpenAI4j
+*   **Other Libraries:** Lombok, Jackson, JJWT (JSON Web Tokens), Apache Commons.
+
+---
+
 ### 说明
 controller层是提供给前端的http接口定义。前端代码在jinx-ui下。
 注意: 遇到mastergo链接，调用mastergo工具
