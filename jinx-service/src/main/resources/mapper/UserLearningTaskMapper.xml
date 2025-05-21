@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learn.infrastructure.repository.mapper.UserLearningTaskMapper"><!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.learn.infrastructure.repository.entity.UserLearningTask">
+        <id column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="source" property="source" />
+        <result column="biz_type" property="bizType" />
+        <result column="biz_id" property="bizId" />
+        <result column="parent_type" property="parentType" />
+        <result column="parent_id" property="parentId" />
+        <result column="earned_credit" property="earnedCredit" />
+        <result column="certificate_issued" property="certificateIssued" />
+        <result column="certificate_id" property="certificateId" />
+        <result column="status" property="status" />
+        <result column="study_duration" property="studyDuration" />
+        <result column="progress" property="progress" />
+        <result column="score" property="score" />
+        <result column="pass_status" property="passStatus" />
+        <result column="assign_time" property="assignTime" />
+        <result column="start_time" property="startTime" />
+        <result column="deadline" property="deadline" />
+        <result column="completion_time" property="completionTime" />
+        <result column="last_study_time" property="lastStudyTime" />
+        <result column="gmt_create" property="gmtCreate" />
+        <result column="creator_id" property="creatorId" />
+        <result column="creator_name" property="creatorName" />
+        <result column="updater_id" property="updaterId" />
+        <result column="updater_name" property="updaterName" />
+        <result column="attributes" property="attributes" />
+        <result column="gmt_modified" property="gmtModified" />
+        <result column="is_del" property="isDel" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, user_id, source, biz_type, biz_id, parent_type, parent_id, earned_credit, certificate_issued, certificate_id,
+        status, study_duration, progress, score, pass_status, assign_time, start_time, deadline, completion_time, 
+        last_study_time, gmt_create, creator_id, creator_name, updater_id, updater_name, attributes, gmt_modified, is_del
+    </sql>
+    
+    <!-- 统计学习人数和完成人数 -->
+    <select id="countLearnerAndCompletion" resultType="java.util.Map">
+        SELECT 
+            COUNT(1) AS learnerCount,
+            SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) AS completionCount
+        FROM user_learning_task
+        WHERE biz_type = #{bizType}
+        AND biz_id = #{bizId}
+        AND is_del = 0
+    </select>
+    
+    <!-- 统计学习时长 -->
+    <select id="countDuration" resultType="java.util.Map">
+        SELECT 
+            SUM(IFNULL(study_duration, 0)) AS totalDuration,
+            IFNULL(AVG(IFNULL(study_duration, 0)), 0) AS avgDuration
+        FROM user_learning_task
+        WHERE biz_type = #{bizType}
+        AND biz_id = #{bizId}
+        AND is_del = 0
+    </select>
+    
+    <!-- 按内容类型统计完成率 -->
+    <select id="countCompletionByContentType" resultType="java.util.Map">
+        SELECT 
+            biz_type AS contentType,
+            COUNT(1) AS totalCount,
+            SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) AS completedCount
+        FROM user_learning_task
+        WHERE parent_type = #{parentType}
+        AND parent_id = #{parentId}
+        AND is_del = 0
+        GROUP BY biz_type
+    </select>
+    
+    <!-- 按日期统计学习分布 -->
+    <select id="countTimeDistribution" resultType="java.util.Map">
+        SELECT 
+            DATE_FORMAT(IFNULL(completion_time, last_study_time), '%Y-%m-%d') AS date,
+            COUNT(1) AS count
+        FROM user_learning_task
+        WHERE biz_type = #{bizType}
+        AND biz_id = #{bizId}
+        AND is_del = 0
+        AND (completion_time IS NOT NULL OR last_study_time IS NOT NULL)
+        GROUP BY DATE_FORMAT(IFNULL(completion_time, last_study_time), '%Y-%m-%d')
+        ORDER BY date
+    </select>
+    
+    <!-- 按业务类型统计用户学习记录数量 -->
+    <select id="countUserLearningByTypes" resultType="java.util.Map">
+        SELECT 
+            SUM(CASE WHEN biz_type = 'LEARNING_MAP' THEN 1 ELSE 0 END) AS mapTotal,
+            SUM(CASE WHEN biz_type = 'TRAIN' THEN 1 ELSE 0 END) AS trainTotal,
+            COUNT(1) AS allTotal
+        FROM user_learning_task
+        WHERE user_id = #{userId}
+        <if test="countSelective == null or countSelective == false">
+            AND source = 'assign'
+        </if>
+        AND biz_type in ('LEARNING_MAP', 'TRAIN')
+        AND is_del = 0
+    </select>
+
+
+    <select id="getLearningTask" resultType="com.learn.infrastructure.repository.entity.UserLearningTask">
+        SELECT *
+        FROM user_learning_task
+        WHERE user_id = #{userId}
+          AND source = 'ASSIGN'
+          AND biz_type = #{bizType}
+          AND is_del = 0
+        ORDER BY FIELD(status, 'not_start', 'learning', 'completed') asc,
+                 gmt_create asc
+        limit 3
+    </select>
+
+</mapper>

@@ -1,0 +1,81 @@
+/* 修复样式问题 */
+
+/* 1. 修复logo不显示问题 */
+.logo img {
+  height: 32px;
+  margin-right: 12px;
+  display: block; /* 确保图片显示 */
+  max-width: 100%; /* 限制最大宽度 */
+}
+
+/* 2. 修复页面很长的时候，菜单滚动问题 */
+.ant-layout-sider {
+  position: fixed; /* 固定侧边栏 */
+  height: calc(100vh - 68px); /* 设置高度为视口高度 */
+  overflow-y: auto; /* 如果菜单项太多，允许垂直滚动 */
+  left: 0;
+  z-index: 10;
+  background: #fff !important;
+}
+.ant-layout .ant-layout-sider-trigger{
+
+  background: #fff !important;
+  box-shadow: 2px 0 6px rgba(0, 21, 41, 0.08)
+}
+.ant-layout .ant-layout-sider-trigger .anticon{
+  color: #002140 !important;
+}
+
+/* 当侧边栏折叠时调整内容区域的左边距 */
+.ant-layout-sider-collapsed + .ant-layout .ant-layout-content {
+  margin-left: 80px; /* 与折叠后的侧边栏宽度相同 */
+}
+
+/* 4a. 修复搜索选项的文本和输入框不在一行的问题 */
+.ant-form-inline .ant-form-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.ant-form-inline .ant-form-item-label {
+  flex: 0 0 auto;
+  margin-right: 8px;
+}
+
+.ant-form-inline .ant-form-item-control-wrapper {
+  flex: 1 1 auto;
+}
+
+/* 4b. 修复表格显示异常问题 */
+.ant-table-wrapper {
+  overflow-x: auto; /* 添加水平滚动 */
+}
+
+.ant-table {
+  min-width: 100%; /* 确保表格至少占满容器宽度 */
+}
+
+.ant-table-tbody > tr > td {
+  white-space: nowrap; /* 防止内容换行 */
+  overflow: hidden;
+  text-overflow: ellipsis; /* 超出部分显示省略号 */
+}
+
+/* 可以为特定列设置最大宽度 */
+.ant-table-tbody > tr > td.column-with-long-content {
+  max-width: 200px;
+}
+
+/* 修复内容区超出 */
+.ant-layout-content.content{
+  height: calc(100vh - 64px);
+  overflow-y: auto;
+}
+
+
+/** 处理a-form样式 */
+.ant-form-item-row {
+  width: 100%;
+}
+

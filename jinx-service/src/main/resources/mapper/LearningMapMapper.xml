@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learn.infrastructure.repository.mapper.LearningMapMapper">
+
+    <resultMap id="BaseResultMap" type="com.learn.infrastructure.repository.entity.LearningMap">
+            <id property="id" column="id" />
+            <result property="name" column="name" />
+            <result property="cover" column="cover" />
+            <result property="introduction" column="introduction" />
+            <result property="creditRule" column="credit_rule" />
+            <result property="electiveCredit" column="elective_credit" />
+            <result property="requiredCredit" column="required_credit" />
+            <result property="categoryIds" column="category_ids" />
+            <result property="certificateRule" column="certificate_rule" />
+            <result property="certificateId" column="certificate_id" />
+            <result property="dingtalkGroup" column="dingtalk_group" />
+            <result property="dingtalkGroupId" column="dingtalk_group_id" />
+            <result property="startTime" column="start_time" />
+            <result property="endTime" column="end_time" />
+            <result property="unlockMode" column="unlock_mode" />
+            <result property="theme" column="theme" />
+            <result property="gmtCreate" column="gmt_create" />
+            <result property="creatorId" column="creator_id" />
+            <result property="creatorName" column="creator_name" />
+            <result property="updaterId" column="updater_id" />
+            <result property="updaterName" column="updater_name" />
+            <result property="gmtModified" column="gmt_modified" />
+            <result property="isDel" column="is_del" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,name,cover,introduction,credit_rule,elective_credit,
+        required_credit,category_ids,certificate_rule,certificate_id,dingtalk_group,
+        dingtalk_group_id,start_time,end_time,unlock_mode,theme,
+        gmt_create,creator_id,creator_name,updater_id,updater_name,
+        gmt_modified,is_del
+    </sql>
+
+    <select id="batchUpdateCreator">
+        update learning_map
+        SET creator_id = #{newCreatorId},
+        creator_name = #{newCreatorName},
+        updater_id = #{operatorId},
+        updater_name = #{operatorName},
+        gmt_modified = NOW()
+        WHERE id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+</mapper>

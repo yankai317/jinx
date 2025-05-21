@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learn.infrastructure.repository.mapper.UserCertificateMapper">
+
+    <resultMap id="BaseResultMap" type="com.learn.infrastructure.repository.entity.UserCertificate">
+            <id property="id" column="id" />
+            <result property="userId" column="user_id" />
+            <result property="certificateId" column="certificate_id" />
+            <result property="sourceType" column="source_type" />
+            <result property="sourceId" column="source_id" />
+            <result property="issueTime" column="issue_time" />
+            <result property="expireTime" column="expire_time" />
+            <result property="certificateNo" column="certificate_no" />
+            <result property="status" column="status" />
+            <result property="gmtCreate" column="gmt_create" />
+            <result property="creatorId" column="creator_id" />
+            <result property="creatorName" column="creator_name" />
+            <result property="updaterId" column="updater_id" />
+            <result property="updaterName" column="updater_name" />
+            <result property="gmtModified" column="gmt_modified" />
+            <result property="isDel" column="is_del" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,user_id,certificate_id,source_type,source_id,issue_time,
+        expire_time,certificate_no,status,gmt_create,creator_id,
+        creator_name,updater_id,updater_name,gmt_modified,is_del
+    </sql>
+</mapper>

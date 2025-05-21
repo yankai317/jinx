@@ -1,0 +1,23 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- 蓝色 Z 字形公路（带圆角转弯） -->
+  <path d="
+M 10,0
+L 10,80
+Q 10,120 70,120
+L 130,120
+Q 190,120 190,160
+L 190,200
+" fill="none"
+    stroke="#C7D2FE" stroke-width="20" stroke-linecap="" stroke-linejoin="round"></path>
+
+  <!-- 白色中心分割线（虚线） -->
+  <path d="
+M 10,0
+L 10,80
+Q 10,120 70,120
+L 130,120
+Q 190,120 190,160
+L 190,200
+" fill="none"
+    stroke="white" stroke-width="2" stroke-dasharray="10,10" stroke-linecap="round"></path>
+</svg>

@@ -1,0 +1,8 @@
+<svg width="20" height="200" viewBox="0 0 20 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- 蓝色公路背景 -->
+  <rect x="0" y="0" width="20" height="200" fill="#C7D2FE" />
+
+  <!-- 白色垂直分割线（虚线居中） -->
+  <line x1="10" y1="0" x2="10" y2="200" stroke="white" stroke-width="2" stroke-dasharray="10,10" />
+  <!-- 虚线：10px实线，5px间隔 -->
+</svg>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learn.infrastructure.repository.mapper.OrgRoleMapper">
+
+    <resultMap id="BaseResultMap" type="com.learn.infrastructure.repository.entity.OrgRole">
+            <id property="id" column="id" />
+            <result property="roleName" column="role_name" />
+            <result property="roleDescription" column="role_description" />
+            <result property="parentId" column="parent_id" />
+            <result property="externalId" column="external_id" />
+            <result property="externalSource" column="external_source" />
+            <result property="gmtCreate" column="gmt_create" />
+            <result property="gmtModified" column="gmt_modified" />
+            <result property="isDel" column="is_del" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,role_name,role_description,parent_id,external_id,external_source,
+        gmt_create,gmt_modified,is_del
+    </sql>
+    
+    <!-- 批量插入角色 -->
+    <insert id="batchInsert" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO org_role (
+            role_name, role_description, parent_id, external_id, external_source, 
+            gmt_create, gmt_modified, is_del
+        ) VALUES 
+        <foreach collection="list" item="item" separator=",">
+            (
+                #{item.roleName}, #{item.roleDescription}, #{item.parentId}, 
+                #{item.externalId}, #{item.externalSource}, #{item.gmtCreate}, 
+                #{item.gmtModified}, #{item.isDel}
+            )
+        </foreach>
+    </insert>
+    
+    <!-- 批量更新角色 -->
+    <update id="updateBatchById" parameterType="java.util.List">
+        INSERT INTO org_role (
+            id, role_name, role_description, parent_id, external_id, external_source, gmt_modified, is_del
+        ) VALUES 
+        <foreach collection="list" item="item" separator=",">
+            (
+                #{item.id}, #{item.roleName}, #{item.roleDescription}, #{item.parentId}, 
+                #{item.externalId}, #{item.externalSource}, #{item.gmtModified}, #{item.isDel}
+            )
+        </foreach>
+        ON DUPLICATE KEY UPDATE 
+        role_name = VALUES(role_name),
+        role_description = VALUES(role_description),
+        parent_id = VALUES(parent_id),
+        external_id = VALUES(external_id),
+        external_source = VALUES(external_source),
+        gmt_modified = VALUES(gmt_modified),
+        is_del = VALUES(is_del)
+    </update>
+    
+    <!-- 批量逻辑删除过期角色 -->
+    <update id="batchDeleteByUpdateTime">
+        UPDATE org_role 
+        SET is_del = 1, gmt_modified = #{now}
+        WHERE gmt_modified &lt; #{baseTime}
+        AND is_del = 0
+        <if test="notInExternalIds != null and notInExternalIds.size() > 0">
+            AND external_id NOT IN
+            <foreach collection="notInExternalIds" item="externalId" open="(" separator="," close=")">
+                #{externalId}
+            </foreach>
+        </if>
+    </update>
+</mapper>

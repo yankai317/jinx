@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learn.infrastructure.repository.mapper.FunctionRoleUserMapper">
+
+    <resultMap id="BaseResultMap" type="com.learn.infrastructure.repository.entity.FunctionRoleUser">
+            <id property="id" column="id" />
+            <result property="functionRoleId" column="function_role_id" />
+            <result property="userId" column="user_id" />
+            <result property="departmentId" column="department_id" />
+            <result property="gmtCreate" column="gmt_create" />
+            <result property="creatorId" column="creator_id" />
+            <result property="creatorName" column="creator_name" />
+            <result property="updaterId" column="updater_id" />
+            <result property="updaterName" column="updater_name" />
+            <result property="gmtModified" column="gmt_modified" />
+            <result property="isDel" column="is_del" />
+    </resultMap>
+
+    <resultMap id="UserResultMap" type="com.learn.infrastructure.repository.entity.User">
+            <id property="id" column="id" />
+            <result property="userId" column="user_id" />
+            <result property="employeeNo" column="employee_no" />
+            <result property="nickname" column="nickname" />
+            <result property="avatar" column="avatar" />
+            <result property="gmtCreate" column="gmt_create" />
+            <result property="creatorId" column="creator_id" />
+            <result property="creatorName" column="creator_name" />
+            <result property="updaterId" column="updater_id" />
+            <result property="updaterName" column="updater_name" />
+            <result property="gmtModified" column="gmt_modified" />
+            <result property="isDel" column="is_del" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,function_role_id,user_id,department_id,gmt_create,creator_id,
+        creator_name,updater_id,updater_name,gmt_modified,is_del
+    </sql>
+    
+    <!-- 查询有效的管理员用户信息（分页） -->
+    <select id="queryAdministratorUsers" resultMap="UserResultMap">
+        SELECT DISTINCT u.id, u.user_id, u.employee_no, u.nickname, u.avatar, 
+               u.gmt_create, u.creator_id, u.creator_name, 
+               u.updater_id, u.updater_name, u.gmt_modified, u.is_del
+        FROM user u
+        INNER JOIN function_role_user fru ON u.user_id = fru.user_id
+        WHERE fru.function_role_id IN
+        <foreach collection="roleIds" item="roleId" open="(" separator="," close=")">
+            #{roleId}
+        </foreach>
+        AND fru.is_del = 0
+        AND u.is_del = 0
+        <if test="keyword != null and keyword != ''">
+            AND (u.nickname LIKE CONCAT(#{keyword}, '%') OR u.employee_no LIKE CONCAT(#{keyword}, '%'))
+        </if>
+        ORDER BY u.gmt_create DESC
+    </select>
+    
+    <!-- 查询有效的管理员用户信息（不分页） -->
+    <select id="queryAdministratorUsersWithoutPage" resultMap="UserResultMap">
+        SELECT DISTINCT u.id, u.user_id, u.employee_no, u.nickname, u.avatar, 
+               u.gmt_create, u.creator_id, u.creator_name, 
+               u.updater_id, u.updater_name, u.gmt_modified, u.is_del
+        FROM user u
+        INNER JOIN function_role_user fru ON u.user_id = fru.user_id
+        WHERE fru.function_role_id IN
+        <foreach collection="roleIds" item="roleId" open="(" separator="," close=")">
+            #{roleId}
+        </foreach>
+        AND fru.is_del = 0
+        AND u.is_del = 0
+        <if test="keyword != null and keyword != ''">
+            AND (u.nickname LIKE CONCAT(#{keyword}, '%') OR u.employee_no LIKE CONCAT(#{keyword}, '%'))
+        </if>
+        ORDER BY u.gmt_create DESC
+    </select>
+</mapper>

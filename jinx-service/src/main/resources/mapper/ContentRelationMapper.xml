@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learn.infrastructure.repository.mapper.ContentRelationMapper">
+
+    <resultMap id="BaseResultMap" type="com.learn.infrastructure.repository.entity.ContentRelation">
+            <id property="id" column="id" />
+            <result property="bizId" column="biz_id" />
+            <result property="bizType" column="biz_type" />
+            <result property="contentType" column="content_type" />
+            <result property="contentId" column="content_id" />
+            <result property="contentUrl" column="content_url" />
+            <result property="contentBizType" column="content_biz_type" />
+            <result property="sortOrder" column="sort_order" />
+            <result property="isRequired" column="is_required" />
+            <result property="gmtCreate" column="gmt_create" />
+            <result property="creatorId" column="creator_id" />
+            <result property="attribute" column="attribute" />
+            <result property="creatorName" column="creator_name" />
+            <result property="updaterId" column="updater_id" />
+            <result property="updaterName" column="updater_name" />
+            <result property="gmtModified" column="gmt_modified" />
+            <result property="isDel" column="is_del" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,biz_id,biz_type,content_type,content_id,content_url,
+        content_biz_type,sort_order,is_required,gmt_create,creator_id,
+        attribute,creator_name,updater_id,updater_name,gmt_modified,
+        is_del
+    </sql>
+    
+    <!-- 批量逻辑删除内容关联 -->
+    <update id="batchLogicalDelete">
+        UPDATE content_relation
+        SET is_del = 1,
+            updater_id = #{updaterId},
+            updater_name = #{updaterName},
+            gmt_modified = #{gmtModified}
+        WHERE biz_type = #{type}
+        and
+        biz_id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+    
+    <!-- 批量插入内容关联 -->
+    <insert id="batchInsert" parameterType="java.util.List">
+        INSERT INTO content_relation (
+            biz_id, biz_type, content_type, content_id, content_url,
+            content_biz_type, sort_order, is_required, gmt_create, creator_id,
+            attributes, creator_name, updater_id, updater_name, gmt_modified, is_del
+        ) VALUES
+        <foreach collection="relations" item="relation" separator=",">
+            (
+                #{relation.bizId}, #{relation.bizType}, #{relation.contentType}, 
+                #{relation.contentId}, #{relation.contentUrl}, #{relation.contentBizType}, 
+                #{relation.sortOrder}, #{relation.isRequired}, #{relation.gmtCreate}, 
+                #{relation.creatorId}, #{relation.attributes}, #{relation.creatorName},
+                #{relation.updaterId}, #{relation.updaterName}, #{relation.gmtModified}, 
+                #{relation.isDel}
+            )
+        </foreach>
+    </insert>
+</mapper>

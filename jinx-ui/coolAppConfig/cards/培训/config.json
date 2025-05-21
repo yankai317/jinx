@@ -1,0 +1,43 @@
+{
+  "nextCursor": null,
+  "gmtModified": "2025-05-14T05:34:45.000Z",
+  "extension": {
+    "supportStopStreaming": null,
+    "templateType": null,
+    "disableJsFormat": null,
+    "mdVer": null,
+    "forceUpdate": null,
+    "platform": "im",
+    "templateCdsInfo": null,
+    "isForbidden": null,
+    "schemaOssKey": null,
+    "coolApp": 1,
+    "auditStatus": 0,
+    "templateTypeEnum": null,
+    "class": "com.dingtalk.interactive.card.client.lwp.model.CardRenderTemplateExtension"
+  },
+  "editorData": null,
+  "hasMore": null,
+  "bundleId": null,
+  "creatorId": 175691894,
+  "templateSchema": "",
+  "templateId": "96460ffe-1e12-446e-bd13-a049bdd21369",
+  "gmtCreate": "2025-05-14T05:34:45.000Z",
+  "orgId": 13141014,
+  "renderTemplate": {
+    "cardSchema": null,
+    "mdVer": null,
+    "widgetName": null,
+    "packedSchema": null,
+    "miniAppId": null,
+    "jsonSchema": null,
+    "templateVersion": null,
+    "class": "com.dingtalk.interactive.card.client.lwp.model.RenderTemplateModel",
+    "schemaDownloadModel": null
+  },
+  "name": "培训",
+  "tenantId": "lippi-imopen-dd034f1d62e3d787fd9d7175ec86360f",
+  "widgetInfo": null,
+  "class": "com.dingtalk.interactive.card.client.lwp.model.CardRenderTemplateModel",
+  "publishStatus": "new"
+}

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learn.infrastructure.repository.mapper.CoursesMapper">
+
+    <resultMap id="BaseResultMap" type="com.learn.infrastructure.repository.entity.Courses">
+            <id property="id" column="id" />
+            <result property="title" column="title" />
+            <result property="type" column="type" />
+            <result property="coverImage" column="cover_image" />
+            <result property="instructorId" column="instructor_id" />
+            <result property="description" column="description" />
+            <result property="credit" column="credit" />
+            <result property="categoryIds" column="category_ids" />
+            <result property="status" column="status" />
+            <result property="allowComments" column="allow_comments" />
+            <result property="isTop" column="is_top" />
+            <result property="viewCount" column="view_count" />
+            <result property="completeCount" column="complete_count" />
+            <result property="article" column="article" />
+            <result property="appendixType" column="appendix_type" />
+            <result property="appendixPath" column="appendix_path" />
+            <result property="isDel" column="is_deleted" />
+            <result property="publishTime" column="publish_time" />
+            <result property="gmtCreate" column="gmt_create" />
+            <result property="creatorId" column="creator_id" />
+            <result property="creatorName" column="creator_name" />
+            <result property="updaterId" column="updater_id" />
+            <result property="updaterName" column="updater_name" />
+            <result property="gmtModified" column="gmt_modified" />
+            <result property="isDel" column="is_del" />
+            <result property="ifIsCitable" column="if_is_citable" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,title,type,cover_image,instructor_id,description,
+        credit,category_ids,status,allow_comments,is_top,
+        view_count,complete_count,article,appendix_type,appendix_path,
+        is_deleted,publish_time,gmt_create,creator_id,creator_name,
+        updater_id,updater_name,gmt_modified,is_del, if_is_citable
+    </sql>
+
+    <!-- 统计学习时长 -->
+    <select id="batchUpdateCreator">
+        update courses
+        SET creator_id = #{newCreatorId},
+            creator_name = #{newCreatorName},
+            updater_id = #{operatorId},
+            updater_name = #{operatorName},
+            gmt_modified = NOW()
+        WHERE id in
+        <foreach collection="courseIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        AND is_del = 0
+    </select>
+    
+    <!-- 批量逻辑删除课程 -->
+    <update id="batchLogicalDelete">
+        update courses
+        SET is_del = 1,
+            updater_id = #{updaterId},
+            updater_name = #{updaterName},
+            gmt_modified = #{gmtModified}
+        WHERE id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        AND is_del = 0
+    </update>
+    
+    <!-- 批量统计课程的查看数和完成数 -->
+    <select id="batchCountViewAndComplete" resultType="java.util.Map">
+        SELECT 
+            ult.biz_id AS courseId,
+            COUNT(DISTINCT ult.user_id) AS viewCount,
+            SUM(CASE WHEN ult.status = 'completed' THEN 1 ELSE 0 END) AS completeCount
+        FROM user_learning_task ult
+        WHERE ult.biz_type = 'COURSE'
+        AND ult.biz_id IN
+        <foreach collection="courseIds" item="courseId" open="(" separator="," close=")">
+            #{courseId}
+        </foreach>
+        AND ult.is_del = 0
+        GROUP BY ult.biz_id
+    </select>
+
+</mapper>

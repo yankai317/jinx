@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learn.infrastructure.repository.mapper.DepartmentMapper">
+
+    <resultMap id="BaseResultMap" type="com.learn.infrastructure.repository.entity.Department">
+            <id property="id" column="id" />
+            <result property="departmentName" column="department_name" />
+            <result property="parentId" column="parent_id" />
+            <result property="departmentPath" column="department_path" />
+            <result property="departmentLevel" column="department_level" />
+            <result property="sortOrder" column="sort_order" />
+            <result property="externalId" column="external_id" />
+            <result property="externalSource" column="external_source" />
+            <result property="gmtCreate" column="gmt_create" />
+            <result property="creatorId" column="creator_id" />
+            <result property="creatorName" column="creator_name" />
+            <result property="updaterId" column="updater_id" />
+            <result property="updaterName" column="updater_name" />
+            <result property="gmtModified" column="gmt_modified" />
+            <result property="isDel" column="is_del" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,department_name,parent_id,department_path,department_level,sort_order,
+        external_id,external_source,gmt_create,creator_id,creator_name,
+        updater_id,updater_name,gmt_modified,is_del
+    </sql>
+    
+    <!-- 根据部门ID列表查询部门及其子部门下的所有用户ID -->
+    <select id="selectUserIdsByOrgIdsWithChildren" resultType="java.lang.Long">
+        SELECT DISTINCT du.user_id
+        FROM department_user du
+        JOIN department d ON du.department_id = d.id
+        WHERE du.is_del = 0
+        AND d.is_del = 0
+        <if test="orgIds != null and orgIds.size() > 0">
+            AND MATCH(d.department_path) AGAINST(
+                <trim prefix="'" suffix="' IN BOOLEAN MODE">
+                    <foreach collection="orgIds" item="orgId" separator=" ">
+                        +${orgId}*
+                    </foreach>
+                </trim>
+            )
+        </if>
+    </select>
+
+    <!-- 批量逻辑删除过期部门 -->
+    <update id="batchDeleteByUpdateTime" parameterType="java.util.Map">
+        UPDATE department 
+        SET is_del = 1, gmt_modified = #{now} 
+        WHERE gmt_modified &lt; #{baseTime}
+        AND is_del = 0
+        AND external_source = #{externalSource}
+        <if test="notInExternalIds != null and notInExternalIds.size() > 0">
+            AND external_id NOT IN
+            <foreach collection="notInExternalIds" item="externalId" open="(" separator="," close=")">
+                #{externalId}
+            </foreach>
+        </if>
+    </update>
+    
+    <!-- 批量插入部门 -->
+    <insert id="batchInsert" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id" >
+        INSERT INTO department (
+            department_name, parent_id, department_level, sort_order, 
+            external_id, external_source, is_del
+        ) VALUES 
+        <foreach collection="list" item="item" separator=",">
+            (
+                #{item.departmentName}, #{item.parentId}, #{item.departmentLevel}, #{item.sortOrder}, 
+                #{item.externalId}, #{item.externalSource}, #{item.isDel}
+            )
+        </foreach>
+    </insert>
+    
+    <!-- 批量更新部门 -->
+    <update id="batchUpdate" parameterType="java.util.List">
+        INSERT INTO department (
+            id, department_name, parent_id, department_level, sort_order, is_del, department_path
+        ) VALUES 
+        <foreach collection="list" item="item" separator=",">
+            (
+                #{item.id}, #{item.departmentName}, #{item.parentId}, #{item.departmentLevel}, 
+                #{item.sortOrder}, #{item.isDel}, #{item.departmentPath}
+            )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        department_name = VALUES(department_name),
+        parent_id = VALUES(parent_id),
+        department_level = VALUES(department_level),
+        sort_order = VALUES(sort_order),
+        department_path = VALUES(department_path),
+        is_del = VALUES(is_del)
+    </update>
+
+</mapper>

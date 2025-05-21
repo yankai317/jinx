@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learn.infrastructure.repository.mapper.TrainOperationLogMapper">
+
+    <resultMap id="BaseResultMap" type="com.learn.infrastructure.repository.entity.OperationLog">
+            <id property="id" column="id" />
+            <result property="bizId" column="biz_id" />
+            <result property="operationType" column="operation_type" />
+            <result property="operationDetail" column="operation_detail" />
+            <result property="operationSummary" column="operation_summary" />
+            <result property="operatorId" column="operator_id" />
+            <result property="operatorName" column="operator_name" />
+            <result property="operationTime" column="operation_time" />
+            <result property="gmtCreate" column="gmt_create" />
+            <result property="creatorId" column="creator_id" />
+            <result property="attributes" column="attributes" />
+            <result property="creatorName" column="creator_name" />
+            <result property="updaterId" column="updater_id" />
+            <result property="updaterName" column="updater_name" />
+            <result property="gmtModified" column="gmt_modified" />
+            <result property="isDel" column="is_del" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,train_id,operation_type,operation_detail,operation_summary,operator_id,
+        operator_name,operation_time,gmt_create,creator_id,attribute,
+        creator_name,updater_id,updater_name,gmt_modified,is_del
+    </sql>
+</mapper>

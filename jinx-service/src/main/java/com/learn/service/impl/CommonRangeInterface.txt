@@ -1,0 +1,30 @@
+===========================================================================
+{    
+"project":"jinx",
+"task":"实现一下com.learn.service.CommonRangeInterface里面的代码。功能逻辑在注释里面。对应的表是common_range"
+}
+===========================================================================
+{    
+"project":"jinx",
+"task":"调整com.learn.service.CommonRangeInterface的入参为一个对象，出参也要作为一个对象
+1. 不需要createRange
+2. batchCreateRange 接口中不能循环调用单个接口。只能执行一次批量插入的sql
+3. queryBusinessIdsByTargetIds 需要支持多组  targetType -> targetIds, 并且是包含逻辑。
+   只要包含一个id就是存在，这里需要使用数据库的全文索引，代码重新读取一下。有修改",
+   "requestId:"111cbacbe9944de7947394cbc71ea3ba"
+   }
+===========================================================================
+   {    
+   "project":"jinx",
+   "task":"CommonRangeMapper 里面需要返回CommonRange对象。在 CommonRangeInterfaceImpl 中处理成返回对象。
+1. 删除接口只需要返回一个boolean。
+2. 修改返回值为List<CommonRangeQueryResponse> 返回对象。其中一个CommonRangeQueryResponse直接包含一个bussinessId，
+   包含部门ids、角色ids、人员ids字段",
+   "requestId":"111cbacbe9944de7947394cbc71ea3ba"
+   }
+===========================================================================
+   {
+   "project":"jinx",
+   "task":"1. 创建一个公用的异常， CommonRangeInterfaceImpl 中的try catch 去掉。异常的情况直接抛异常出去",
+   "requestId":"111cbacbe9944de7947394cbc71ea3ba"
+   }

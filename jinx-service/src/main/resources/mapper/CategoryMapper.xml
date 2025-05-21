@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learn.infrastructure.repository.mapper.CategoryMapper">
+
+    <resultMap id="BaseResultMap" type="com.learn.infrastructure.repository.entity.Category">
+            <id property="id" column="id" />
+            <result property="name" column="name" />
+            <result property="parentId" column="parent_id" />
+            <result property="path" column="path" />
+            <result property="level" column="level" />
+            <result property="sort" column="sort" />
+            <result property="gmtCreate" column="gmt_create" />
+            <result property="creatorId" column="creator_id" />
+            <result property="creatorName" column="creator_name" />
+            <result property="updaterId" column="updater_id" />
+            <result property="updaterName" column="updater_name" />
+            <result property="gmtModified" column="gmt_modified" />
+            <result property="isDel" column="is_del" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,name,parent_id,path,level,sort,
+        gmt_create,creator_id,creator_name,updater_id,updater_name,
+        gmt_modified,is_del
+    </sql>
+    
+    <!-- 通过全文索引查询path中包含指定ID列表中任一ID的分类 -->
+    <select id="findCategoriesByPathContainsId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM category
+        WHERE is_del = 0
+        <if test="categoryIds != null and categoryIds.size() > 0">
+            AND (
+                <foreach collection="categoryIds" item="categoryId" separator=" OR ">
+                    MATCH(path) AGAINST(
+                        CONCAT(
+                            '"', #{categoryId}, '" ',  <!-- 精确匹配categoryId -->
+                            '+"', #{categoryId}, ',*" ',  <!-- 匹配以categoryId开头的路径 -->
+                            '+"*,', #{categoryId}, ',*" ',  <!-- 匹配中间包含categoryId的路径 -->
+                            '+"*,', #{categoryId}, '"'  <!-- 匹配以categoryId结尾的路径 -->
+                        ) 
+                        IN BOOLEAN MODE
+                    )
+                </foreach>
+            )
+        </if>
+    </select>
+</mapper>

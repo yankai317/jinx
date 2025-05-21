@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learn.infrastructure.repository.mapper.AssignRecordsMapper">
+
+    <resultMap id="BaseResultMap" type="com.learn.infrastructure.repository.entity.AssignRecords">
+        <id property="id" column="id" />
+        <result property="type" column="type" />
+        <result property="typeId" column="type_id" />
+        <result property="rangeIds" column="range_ids" />
+        <result property="deadline" column="deadline" />
+        <result property="assignType" column="assign_type" />
+        <result property="status" column="status" />
+        <result property="gmtCreate" column="gmt_create" />
+        <result property="attributes" column="attributes" />
+        <result property="creatorId" column="creator_id" />
+        <result property="creatorName" column="creator_name" />
+        <result property="updaterId" column="updater_id" />
+        <result property="updaterName" column="updater_name" />
+        <result property="gmtModified" column="gmt_modified" />
+        <result property="isDel" column="is_del" />
+        <result property="assignFinishedTimeType" column="assign_finished_time_type" />
+        <result property="customFinishedDay" column="custom_finished_day" />
+        <result property="ifIsNotifyExistUser" column="if_is_notify_exist_user" />
+        <result property="notifyUserAfterJoinDate" column="notify_user_after_join_date" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,type,type_id,range_ids,deadline,assign_type,
+        status,gmt_create,attributes,creator_id,creator_name,
+        updater_id,updater_name,gmt_modified,is_del,assign_finished_time_type,
+        custom_finished_day,if_is_notify_exist_user,notify_user_after_join_date
+    </sql>
+</mapper>

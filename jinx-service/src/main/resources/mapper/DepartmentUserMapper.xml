@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learn.infrastructure.repository.mapper.DepartmentUserMapper">
+
+    <resultMap id="BaseResultMap" type="com.learn.infrastructure.repository.entity.DepartmentUser">
+            <id property="id" column="id" />
+            <result property="departmentId" column="department_id" />
+            <result property="userId" column="user_id" />
+            <result property="gmtCreate" column="gmt_create" />
+            <result property="creatorId" column="creator_id" />
+            <result property="creatorName" column="creator_name" />
+            <result property="updaterId" column="updater_id" />
+            <result property="updaterName" column="updater_name" />
+            <result property="gmtModified" column="gmt_modified" />
+            <result property="isDel" column="is_del" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,department_id,user_id,gmt_create,creator_id,creator_name,
+        updater_id,updater_name,gmt_modified,is_del
+    </sql>
+    
+    <!-- 批量插入或更新部门用户关系 -->
+    <insert id="insertOrUpdateBatch" parameterType="java.util.List">
+        INSERT INTO department_user
+        (department_id, user_id, gmt_create, gmt_modified, is_del)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.departmentId}, #{item.userId}, #{item.gmtCreate}, #{item.gmtModified}, #{item.isDel})
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        is_del = VALUES(is_del),
+        gmt_modified = now()
+
+    </insert>
+
+    
+    <!-- 批量逻辑删除过期关系 -->
+    <update id="batchDeleteByUpdateTime">
+        UPDATE department_user 
+        SET is_del = 1
+        WHERE gmt_modified &lt; #{baseTime}
+        AND is_del = 0
+    </update>
+</mapper>

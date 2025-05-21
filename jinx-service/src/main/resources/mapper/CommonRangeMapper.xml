@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learn.infrastructure.repository.mapper.CommonRangeMapper">
+
+    <resultMap id="BaseResultMap" type="com.learn.infrastructure.repository.entity.CommonRange">
+            <id property="id" column="id" />
+            <result property="modelType" column="model_type" />
+            <result property="typeId" column="type_id" />
+            <result property="type" column="type" />
+            <result property="targetType" column="target_type" />
+            <result property="targetIds" column="target_ids" />
+            <result property="startTime" column="start_time" />
+            <result property="endTime" column="end_time" />
+            <result property="gmtCreate" column="gmt_create" />
+            <result property="attributes" column="attributes" />
+            <result property="creatorId" column="creator_id" />
+            <result property="creatorName" column="creator_name" />
+            <result property="updaterId" column="updater_id" />
+            <result property="updaterName" column="updater_name" />
+            <result property="gmtModified" column="gmt_modified" />
+            <result property="isDel" column="is_del" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        id,model_type,type_id,type,target_type,target_ids,
+        start_time,end_time,gmt_create,attributes,creator_id,
+        creator_name,updater_id,updater_name,gmt_modified,is_del
+    </sql>
+    
+    <!-- 批量插入范围记录 -->
+    <insert id="batchInsert" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO common_range (
+            model_type, type_id, type, target_type, target_ids,
+            start_time, end_time, gmt_create, attributes, creator_id, 
+            creator_name, updater_id, updater_name, gmt_modified, is_del,type_biz_id
+        ) VALUES 
+        <foreach collection="list" item="item" separator=",">
+            (
+                #{item.modelType}, #{item.typeId}, #{item.type}, #{item.targetType}, #{item.targetIds},
+                #{item.startTime}, #{item.endTime}, #{item.gmtCreate}, #{item.attributes}, #{item.creatorId},
+                #{item.creatorName}, #{item.updaterId}, #{item.updaterName}, #{item.gmtModified}, #{item.isDel}, #{item.typeBizId}
+            )
+        </foreach>
+    </insert>
+    
+    <!-- 根据目标ID查询范围记录，使用全文索引 -->
+    <select id="queryRangesByTargetId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM common_range
+        WHERE model_type = #{modelType}
+        AND type = #{type}
+        AND target_type = #{targetType}
+        AND is_del = 0
+        AND MATCH(target_ids) AGAINST(#{targetId} IN BOOLEAN MODE)
+    </select>
+    
+    <!-- 根据多个目标类型和ID查询范围记录，使用全文索引 -->
+    <select id="queryRangesByTargets" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM common_range
+        WHERE model_type = #{modelType}
+        AND type = #{type}
+        AND is_del = 0
+        AND (
+            <foreach collection="targetTypeAndIds" index="targetType" item="targetIds" separator=" OR ">
+                (target_type = #{targetType} AND (
+                    <foreach collection="targetIds" item="targetId" separator=" OR ">
+                        MATCH(target_ids) AGAINST(#{targetId} IN BOOLEAN MODE)
+                    </foreach>
+                ))
+            </foreach>
+        )
+    </select>
+    
+    <!-- 根据业务ID查询范围配置 -->
+    <select id="queryRangeByBusinessId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM common_range
+        WHERE model_type = #{modelType}
+        AND type = #{type}
+        AND type_id = #{typeId}
+        AND is_del = 0
+    </select>
+    
+    <!-- 根据用户ID查询有权限的业务ID列表 -->
+    <select id="queryRangesByUser" resultMap="BaseResultMap">
+        SELECT DISTINCT cr.*
+        FROM common_range cr
+        WHERE cr.model_type = #{modelType}
+        <if test="type != null and type != ''">
+            AND cr.type = #{type}
+        </if>
+        AND cr.is_del = 0
+        AND (
+            <!-- 用户直接授权 -->
+            (cr.target_type = 'user' AND (
+                <foreach collection="userIds" item="userId" separator=" " open="MATCH(cr.target_ids) AGAINST('" close="' IN BOOLEAN MODE)">
+                    ${userId}
+                </foreach>
+            ))
+            <if test="departmentIds != null and departmentIds.size() > 0">
+                <!-- 部门授权 -->
+                OR (cr.target_type = 'department' AND (
+                    <foreach collection="departmentIds" item="deptId" separator=" " open="MATCH(cr.target_ids) AGAINST('" close="' IN BOOLEAN MODE)">
+                        ${deptId}
+                    </foreach>
+                ))
+            </if>
+            
+            <if test="roleIds != null and roleIds.size() > 0">
+                <!-- 角色授权 -->
+                OR (cr.target_type = 'role' AND (
+                    <foreach collection="roleIds" item="roleId"  separator=" " open="MATCH(cr.target_ids) AGAINST('" close="' IN BOOLEAN MODE)">
+                        ${roleId}
+                    </foreach>
+                ))
+            </if>
+        )
+    </select>
+</mapper>

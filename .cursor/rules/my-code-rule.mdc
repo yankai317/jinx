@@ -1,0 +1,97 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Your rule content
+
+# 编码规范
+每条规范都有说明范围，例如java后端代码、vue前端代码
+
+
+## 数据库操作
+- 数据库批量操作不能循环调用单个操作。需要处理完一次性调用数据库插入
+    - 规范范围：java后端代码
+    - 样例
+
+        不符合规范：
+        ```java
+        List<Long> orgRoleList = new ArrayList<>();
+        for (Long orgRoleId : orgRoleList) {
+            orgRoleMapper.selectById(orgRoleId);
+        }
+        ```
+
+        符合规范：
+        ```java
+        LambdaQueryWrapper<LearningMapUserProgress> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.in(OrgRole::getId, orgRoleList)
+        orgRoleMapper.selectList(queryWrapper);
+        ```
+- mybatis-plus 生成的中 .xml文件中 。不能操作非本xml的表。尽量保证一个xml只操作一个表。特殊情况下可以连表使用 CommonRangeMapper.xml 中。对应的表是 CommonRange，其中的sql应该尽量只操作 CommonRange,允许少量的联表，不超过3张表
+    -  规范范围：mybatis-plus
+    - 样例
+        
+        错误样例：
+        ```xml
+        <select id="queryRangeByBusinessId" resultType="integer" ></select>
+        ```
+        
+        正确样例：
+        ```xml
+        <select id="queryRangeByBusinessId" resultMap="BaseResultMap" ></select>
+        ```
+- mybatis-plus mapper返回的对象，都以表对应的entity返回，不要只返回一个基本类型
+    -  规范范围：mybatis-plus 
+
+## 接口定义
+- 方法超过 4个参数的时候需要封装成对象
+    - 规范范围：java后端代码
+    - 样例
+
+        错误样例：
+        ```java
+        RoleListResponse getRoleListA(int page, int pageSize, Long orgId, String keyword);
+        ```
+
+        正确样例：
+        ```java
+        RoleListResponse getRoleList(RoleListRequest request);
+        // RoleListRequest 类中包含参数 page、 pageSize、 orgId、 keyword 成员变量
+        ```
+
+
+## 异常处理
+- java 后端禁止使用try catch 语法，如果能判断出异常 需要使用 com.learn.common.exception.CommonException 来抛出异常
+    例如：
+    ```java
+        if (StringUtils.isEmpty(request.getModelType()) || StringUtils.isEmpty(request.getType())) {
+            throw new CommonException("参数不能为空");
+        }
+    ```
+
+## 常量使用
+- 不要使用魔法值,  需要使用常量 枚举
+    - 规范范围：java后端代码
+    - 样例
+
+        错误样例：
+        ```java
+         CommonRangeQueryRequest request = new CommonRangeQueryRequest();
+        request.setModelType("editor"); // 魔法值，错误
+        ```
+
+        正确样例：
+        ```java
+            CommonRangeQueryRequest request = new CommonRangeQueryRequest();
+            request.setType(BizType.COURSE); // 常量或者枚举、正确
+        ```
+
+## 其他
+
+- 使用get请求时，最多支持两个参数，超过两个参数禁止使用get
+
+- 真实业务项目，所有代码都是线上场景使用的，禁止模拟数据/禁止使用mock数据/禁止跳过业务逻辑/禁止写todo/禁止忽略业务逻辑
+
+- 要遵循高内聚、低耦合、单一职责
